@@ -58,3 +58,35 @@ def _calculate_average_group_covariance(group_embedding_list, group_count):
         avg_group_cov_mat += group_cov
     avg_group_cov_mat = avg_group_cov_mat/group_count
     return avg_group_cov_mat
+
+
+# Metric to capture sum of intra-group diversities using euclidean distance. Should be high ideally.
+def evaluate_intra_diversity(group_embedding_list, group_count):
+    assert len(group_embedding_list) == group_count
+    total_inter_group_diversity = 0
+    for i in range(group_count):
+        group_i = group_embedding_list[i]
+        data_points = group_i.shape[0]
+        for k in range(data_points):
+            for j in range(data_points):
+                total_inter_group_diversity += np.linalg.norm(group_i[k, :] - group_i[j, :])
+    return total_inter_group_diversity
+
+
+# Metric to capture the inter-group diversity using sum of euclidean distances of each group. Should be low ideally.
+def evaluate_inter_diversity(group_embedding_list, group_count):
+    assert len(group_embedding_list) == group_count
+    embedding_dimension = group_embedding_list[0].shape[1]
+    mean_matrix = np.zeros((group_count, embedding_dimension))
+    for i in range(group_count):
+        group_i = group_embedding_list[i]
+        mean = np.mean(group_i, axis=0)
+        mean_matrix[i, :] = mean
+
+    total_inter_diversity = 0
+    for i in range(group_count):
+        for j in range(group_count):
+            total_inter_diversity += np.linalg.norm(mean_matrix[i, :] - mean_matrix[j, :])
+    return total_inter_diversity
+
+

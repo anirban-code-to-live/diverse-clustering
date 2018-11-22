@@ -53,22 +53,31 @@ class ModularityTechnique:
     def divide_into_clusters(self):
         eigen_vals, eigen_vecs = np.linalg.eigh(self._M_matrix)
         X_data = np.array(eigen_vecs[-1]).reshape((len(eigen_vecs[-1]), 1))
-        # kmeans = KMeans(n_clusters=2).fit(X_data)
-        # negative_cluster = [i for i in range(len(kmeans.labels_)) if kmeans.labels_[i] == 0]
-        # positive_cluster = [i for i in range(len(kmeans.labels_)) if kmeans.labels_[i] == 1]
-        negative_cluster = [i for i in range(len(eigen_vecs[-1])) if eigen_vecs[-1][i] < 0]
-        positive_cluster = [i for i in range(len(eigen_vecs[-1])) if eigen_vecs[-1][i] >= 0]
-        positive_cluster_embedding = np.zeros((len(positive_cluster), self._node_dimension))
-        negative_cluster_embedding = np.zeros((len(negative_cluster), self._node_dimension))
-        for i in range(len(positive_cluster)):
-            positive_cluster_embedding[i] = self._embeddings[positive_cluster[i]]
-        for i in range(len(negative_cluster)):
-            negative_cluster_embedding[i] = self._embeddings[negative_cluster[i]]
-        assert len(negative_cluster) + len(positive_cluster) == self._node_count
-        # print(positive_cluster)
-        # print(negative_cluster)
-        # print(positive_cluster_embedding.shape)
-        # print(negative_cluster_embedding.shape)
-        embeddings = [positive_cluster_embedding, negative_cluster_embedding]
+        kmeans = KMeans(n_clusters=self._group_count).fit(X_data)
+        clusters_indices_list = []
+        for i in range(self._group_count):
+            cluster_i = [j for j in range(len(kmeans.labels_)) if kmeans.labels_[j] == i]
+            clusters_indices_list.append(cluster_i)
+        # negative_cluster = [i for i in range(len(eigen_vecs[-1])) if eigen_vecs[-1][i] < 0]
+        # positive_cluster = [i for i in range(len(eigen_vecs[-1])) if eigen_vecs[-1][i] >= 0]
+        # positive_cluster_embedding = np.zeros((len(positive_cluster), self._node_dimension))
+        # negative_cluster_embedding = np.zeros((len(negative_cluster), self._node_dimension))
+        # for i in range(len(positive_cluster)):
+        #     positive_cluster_embedding[i] = self._embeddings[positive_cluster[i]]
+        # for i in range(len(negative_cluster)):
+        #     negative_cluster_embedding[i] = self._embeddings[negative_cluster[i]]
+        # assert len(negative_cluster) + len(positive_cluster) == self._node_count
+        # # print(positive_cluster)
+        # # print(negative_cluster)
+        # # print(positive_cluster_embedding.shape)
+        # # print(negative_cluster_embedding.shape)
+        # embeddings = [positive_cluster_embedding, negative_cluster_embedding]
         # print('Second largest eigen vector :: ', eigen_vecs[-1])
-        return embeddings, positive_cluster, negative_cluster
+        embeddings = []
+        for i in range(self._group_count):
+            cluster_i_indices = clusters_indices_list[i]
+            embeddings_i = np.zeros((len(cluster_i_indices), self._node_dimension))
+            for j in range(len(cluster_i_indices)):
+                embeddings_i[j] = self._embeddings[cluster_i_indices[j]]
+            embeddings.append(embeddings_i)
+        return embeddings, clusters_indices_list

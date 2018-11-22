@@ -19,14 +19,14 @@ class UniformKMeans:
             cluster_indices_list.append(cluster_i_indices)
 
         assert len(cluster_indices_list) == self._group_count
-        print('Before shuffling -- Cluster indices list :: ', cluster_indices_list)
+        # print('Before shuffling -- Cluster indices list :: ', cluster_indices_list)
 
         # Shuffle each cluster
         for i in range(self._group_count):
             # np.random.shuffle(cluster_embeddings[i])
             np.random.shuffle(cluster_indices_list[i])
 
-        print('After shuffling -- Cluster indices list :: ', cluster_indices_list)
+        # print('After shuffling -- Cluster indices list :: ', cluster_indices_list)
 
         cluster_embeddings = []
         for i in range(self._group_count):
@@ -44,10 +44,10 @@ class UniformKMeans:
         for i in range(self._group_count):
             cluster_lengths.append(len(cluster_indices_list[i]))
         min_cluster_length = np.min(cluster_lengths)
-        print('Minimum cluster length :: ', min_cluster_length)
+        # print('Minimum cluster length :: ', min_cluster_length)
         # List stores number of elements in each uniform cluster contributed by every cluster obtained earlier
         cluster_iteration_count = [int(length/self._group_count) for length in cluster_lengths]
-        print('Cluster iteration count :: ', cluster_iteration_count)
+        # print('Cluster iteration count :: ', cluster_iteration_count)
         # End
         # List stores number of elements remaining in each cluster after the previous iteration count
         cluster_remaining_count = [cluster_lengths[i] - self._group_count*cluster_iteration_count[i]
@@ -55,12 +55,12 @@ class UniformKMeans:
         # End
         # Find out length of each uniform cluster
         uniform_cluster_lengths = [int(self._element_count/self._group_count) for _ in range(self._group_count)]
-        print('Uniform cluster lengths :: ', uniform_cluster_lengths)
+        # print('Uniform cluster lengths :: ', uniform_cluster_lengths)
         remaining_element_count = int(self._element_count - int(self._element_count/self._group_count)*self._group_count)
-        print('Remaining element count :: ', remaining_element_count)
+        # print('Remaining element count :: ', remaining_element_count)
         for i in range(remaining_element_count):
             uniform_cluster_lengths[i] += uniform_cluster_lengths[i] + 1
-        print('Uniform cluster lengths after adding remaining counts :: ', uniform_cluster_lengths)
+        # print('Uniform cluster lengths after adding remaining counts :: ', uniform_cluster_lengths)
         # End
 
         uniform_cluster_embeddings = []  # List containing embedding matrix of each cluster

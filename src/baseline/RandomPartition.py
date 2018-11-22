@@ -14,14 +14,14 @@ class RandomPartitions:
     def cluster(self):
         node_indices_list = np.arange(self._node_count)
         np.random.shuffle(node_indices_list)
-        print(node_indices_list)
+        # print(node_indices_list)
         element_count_each_group = int(self._node_count / self._group_count)
         clusters = []
         for index in range(self._group_count):
             if index != self._group_count - 1:
-                cluster_i_index = node_indices_list[index*element_count_each_group: (index+1)*element_count_each_group]
+                cluster_i_index = list(node_indices_list[index*element_count_each_group: (index+1)*element_count_each_group])
             else:
-                cluster_i_index = node_indices_list[index*element_count_each_group: -1]
+                cluster_i_index = list(node_indices_list[index*element_count_each_group: self._node_count])
             clusters.append(cluster_i_index)
 
         cluster_embeddings = []
