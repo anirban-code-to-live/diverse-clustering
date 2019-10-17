@@ -1,22 +1,16 @@
 import networkx as nx
-import pandas as pd
-import os
-from scipy.sparse import csgraph
-import matplotlib
-from matplotlib import pyplot as plt
-from src import ModularityTechnique as mt
+from src.baseline import ModularityTechnique as mt
 from src import EvaluationMetric
-import numpy as np
 from src.baseline.KMeansClustering import StandardKMeans as kmeans
 from src.baseline.RandomPartition import RandomPartitions as random_partitions
 from src.baseline.UniformKMeans import UniformKMeans
-from src.visualization import Visualization as vs
+from src.baseline.DivSimGrouping import DivSimGrouping as divsim
 
 
 if __name__ == '__main__':
     print('Welcome to the world full of diversity!!\n')
 
-    graph_name = 'karate'
+    graph_name = 'got'
     group_count = 2
     # Use this code snippet if you want to use adjacency matrix directly
     graph_path = '../data/' + graph_name + '/graph.gml'
@@ -25,11 +19,11 @@ if __name__ == '__main__':
     print('Shape of adjacency matrix :: ', graph_embedding_matrix.shape)
     # end
 
-    # Use this code snippet for generated embeddings using node2vec
-    graph_embed_path = '../data/' + graph_name + '/graph_embed.csv'
-    graph_embedding_matrix = pd.read_csv(graph_embed_path, header=None, sep=' ').values
-    print('Embedding shape :: ', graph_embedding_matrix.shape)
-    # End
+    # # Use this code snippet for generated embeddings using node2vec
+    # graph_embed_path = '../n2v-reverse-data/' + graph_name + '/graph_embed.csv'
+    # graph_embedding_matrix = pd.read_csv(graph_embed_path, header=None, sep=' ').values
+    # print('Embedding shape :: ', graph_embedding_matrix.shape)
+    # # End
 
     # Modularity technique
     print('Diversity based clustering using Modularity technique')
@@ -47,9 +41,9 @@ if __name__ == '__main__':
     print('Total intra-group diversity :: ', total_intra_group_diversity)
     total_inter_group_diversity = EvaluationMetric.evaluate_inter_diversity(embeddings, group_count=group_count)
     print('Total inter-group diversity :: ', total_inter_group_diversity)
-    # Visualize graph with diverse clusters
-    vs.visualize_graph(graph, clusters, technique='modularity', graph_name=graph_name)
-    vs.tsne_visualization(embeddings, graph, clusters, technique='modularity', graph_name=graph_name)
+    # # Visualize graph with diverse clusters
+    # vs.visualize_graph(graph, clusters, technique='modularity', graph_name=graph_name)
+    # vs.tsne_visualization(embeddings, graph, clusters, technique='modularity', graph_name=graph_name)
 
     # Baseline method - KMeans
     print('Diversity based clustering using standard KMeans')
@@ -67,8 +61,8 @@ if __name__ == '__main__':
     total_inter_group_diversity = EvaluationMetric.evaluate_inter_diversity(embeddings, group_count=group_count)
     print('Total inter-group diversity :: ', total_inter_group_diversity)
     # # Visualize graph with diverse clusters
-    vs.visualize_graph(graph, clusters, technique='standard-kmeans', graph_name=graph_name)
-    vs.tsne_visualization(embeddings, graph, clusters, technique='standard-kmeans', graph_name=graph_name)
+    # vs.visualize_graph(graph, clusters, technique='standard-kmeans', graph_name=graph_name)
+    # vs.tsne_visualization(embeddings, graph, clusters, technique='standard-kmeans', graph_name=graph_name)
 
     # Baseline method - Random Partition
     print('Diversity based clustering using Random Partition')
@@ -85,8 +79,8 @@ if __name__ == '__main__':
     total_inter_group_diversity = EvaluationMetric.evaluate_inter_diversity(embeddings, group_count=group_count)
     print('Total inter-group diversity :: ', total_inter_group_diversity)
     # # Visualize graph with diverse clusters
-    vs.visualize_graph(graph, clusters, technique='random-partition', graph_name=graph_name)
-    vs.tsne_visualization(embeddings, graph, clusters, technique='random-partition', graph_name=graph_name)
+    # vs.visualize_graph(graph, clusters, technique='random-partition', graph_name=graph_name)
+    # vs.tsne_visualization(embeddings, graph, clusters, technique='random-partition', graph_name=graph_name)
 
     # Baseline method - Uniform KMeans
     print('Diversity based clustering using Uniform KMeans')
@@ -104,7 +98,20 @@ if __name__ == '__main__':
     total_inter_group_diversity = EvaluationMetric.evaluate_inter_diversity(embeddings, group_count=group_count)
     print('Total inter-group diversity :: ', total_inter_group_diversity)
     # # Visualize graph with diverse clusters
-    vs.visualize_graph(graph, clusters, technique='uniform-kmeans', graph_name=graph_name)
-    vs.tsne_visualization(embeddings, graph, clusters, technique='uniform-kmeans', graph_name=graph_name)
+    # vs.visualize_graph(graph, clusters, technique='uniform-kmeans', graph_name=graph_name)
+    # vs.tsne_visualization(embeddings, graph, clusters, technique='uniform-kmeans', graph_name=graph_name)
+
+    # DivSim Grouping technique
+    print('\nDiversity based clustering using DivSimGrouping')
+    divsim_grouping = divsim(adjacency_mat=graph_embedding_matrix, groups=group_count)
+    embeddings, clusters = divsim_grouping.cluster()
+    total_intra_group_diversity = EvaluationMetric.evaluate_intra_diversity(embeddings, group_count=group_count)
+    print('Total intra-group diversity :: ', total_intra_group_diversity)
+    total_inter_group_diversity = EvaluationMetric.evaluate_inter_diversity(embeddings, group_count=group_count)
+    print('Total inter-group diversity :: ', total_inter_group_diversity)
+    # # Visualize graph with diverse clusters
+    # vs.visualize_graph(graph, clusters, technique='div_sim', graph_name=graph_name)
+    # vs.tsne_visualization(embeddings, graph, clusters, technique='div_sim', graph_name=graph_name)
+
 
 
